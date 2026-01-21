@@ -258,7 +258,7 @@
   const checkHolesAndRails = (module) => {
     const getDistance = (hole1, hole2) => {
       return Math.sqrt(
-        Math.pow(hole1.x - hole2.x, 2) + Math.pow(hole1.y - hole2.y, 2)
+        Math.pow(hole1.x - hole2.x, 2) + Math.pow(hole1.y - hole2.y, 2),
       );
     };
 
@@ -422,7 +422,7 @@
   const removeModule = async (index) => {
     // リフレッシュさせるため一旦クリアしている
     const tempModules = structuredClone(
-      placedModules.filter((_, i) => i !== index)
+      placedModules.filter((_, i) => i !== index),
     );
     placedModules = [];
     await tick();
@@ -529,10 +529,26 @@
             ></div>
           {/each}
           <!-- デスクのビームを表示 -->
-          {#each selectedDesk.beams as beam}
+          <!-- 縦長のビーム（左右）を先に描画 -->
+          {#each selectedDesk.beams.filter((b) => b.height > b.length) as beam}
+            {@const isLeftBeam = beam.x < selectedDesk.width / 2}
+            {@const borderRadius = isLeftBeam
+              ? "border-top-right-radius: 8px; border-bottom-right-radius: 8px;"
+              : "border-top-left-radius: 8px; border-bottom-left-radius: 8px;"}
+            {@const opacity = beam.notCross ? "opacity: 0;" : ""}
             <div
-              class="beam"
-              style="top: {beam.y}px; left: {beam.x}px; width: {beam.length}px; height: {beam.height}px;"
+              class="beam {isLeftBeam ? 'beam-left' : 'beam-right'}"
+              style="top: {beam.y}px; left: {beam.x}px; width: {beam.length}px; height: {beam.height}px; {borderRadius} {opacity}"
+            ></div>
+          {/each}
+          <!-- 横長のビーム（中央）を後から描画して上に重ねる -->
+          {#each selectedDesk.beams.filter((b) => b.length >= b.height) as beam}
+            {@const opacity = beam.notCross ? "opacity: 0;" : ""}
+            <div
+              class="beam beam-horizontal"
+              style="top: {beam.y}px; left: {beam.x +
+                3}px; width: {beam.length -
+                6}px; height: {beam.height}px; {opacity}"
             ></div>
           {/each}
 
@@ -665,14 +681,56 @@
   }
   .hole {
     position: absolute;
-    background-color: #818181;
+    background-color: #333;
     border: 1px solid #222;
     border-radius: 50%;
+  }
+  .hole::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 200%;
+    height: 200%;
+    border: 1px solid #222;
+    border-radius: 50%;
+    background-color: transparent;
   }
   .beam {
     position: absolute;
     background-color: #b3b3b3;
     border: 1px solid #222;
+  }
+  .beam-left::before,
+  .beam-right::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background-color: #222;
+  }
+  .beam-left::before {
+    left: 2px;
+  }
+  .beam-right::before {
+    right: 2px;
+  }
+  .beam-horizontal {
+    border: none;
+    border-top: 1px solid #222;
+    border-bottom: 1px solid #222;
+    border-left: 1px solid #222;
+    background-image: linear-gradient(to right, #222 0, #222 100%),
+      linear-gradient(to right, #222 0, #222 100%);
+    background-size:
+      100% 1px,
+      100% 1px;
+    background-position:
+      0 20px,
+      0 calc(100% - 20px);
+    background-repeat: no-repeat;
   }
   .palette {
     display: flex;
