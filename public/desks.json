@@ -852,5 +852,57 @@
                 "diameter": 5
             }
         ]
+    },
+    {
+        "id": "DASHBOARD-140",
+        "name": "DASHBOARD - 140",
+        "type": "dashboard",
+        "width": 1400,
+        "height": 230,
+        "railPattern": {
+            "origin": {
+                "x": 95,
+                "y": 40
+            },
+            "steps": {
+                "y": [
+                    150
+                ]
+            },
+            "length": 1210
+        },
+        "holePattern": [
+            {
+                "origin": {
+                    "x": 30,
+                    "y": 40
+                },
+                "steps": {
+                    "x": [
+                        1340
+                    ],
+                    "y": [
+                        75,
+                        75
+                    ]
+                },
+                "diameter": 5
+            },
+            {
+                "origin": {
+                    "x": 70,
+                    "y": 40
+                },
+                "steps": {
+                    "x": [
+                        1260
+                    ],
+                    "y": [
+                        150
+                    ]
+                },
+                "diameter": 5
+            }
+        ]
     }
 ]
